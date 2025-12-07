@@ -24,27 +24,12 @@ P3_Final/
 ```
 
 
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd P3_Final
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-
 ## Usage
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/abdcelikkanat/revisitingkmers.git
-cd revisitingkmers
+git clone https://github.com/Tinnifo/DVML3-AAU.git
+cd DVML3-AAU
 ```
 
 2. Install dependencies: Make sure you have Python 3.8 installed. You can install the required Python packages using pip:
