@@ -1,0 +1,28 @@
+# Python
+*.py[cod]
+*$py.class
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+
+# Data
+marine/
+plant/
+reference/
+train_2m.csv
+val_48k.csv
