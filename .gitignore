@@ -26,3 +26,6 @@ plant/
 reference/
 train_2m.csv
 val_48k.csv
+
+sh/
+

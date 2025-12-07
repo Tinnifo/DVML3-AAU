@@ -19,7 +19,6 @@ def reverse_complement(seq: str) -> str:
     return seq.translate(comp_map)[::-1]
 
 
-
 def split_read(seq: str, k: int, L_min_useful: int, W_target: int):
     L = len(seq)
     if L < k:
@@ -74,15 +73,7 @@ def make_views_for_read(
         if len(views) >= max_views_per_read:
             break
 
-    if not views and len(seq) >= k:
-        # fallback: use the whole read (and maybe RC) if splitting returned nothing
-        views = [seq]
-        if use_reverse_complement and max_views_per_read > 1:
-            rc = reverse_complement(seq)
-            if rc != seq:
-                views.append(rc)
-
-    return views[:max_views_per_read]
+    return views
 
 
 class SupConPairDataset(Dataset):
@@ -150,7 +141,9 @@ class SupConPairDataset(Dataset):
                             parts = stripped_line.split("\t")
                         else:
                             if verbose:
-                                print(f"Warning: Line {line_idx + 1} has no separator, skipping")
+                                print(
+                                    f"Warning: Line {line_idx + 1} has no separator, skipping"
+                                )
                             chosen_idx += 1
                             if chosen_idx >= len(chosen_indices):
                                 break
@@ -158,7 +151,9 @@ class SupConPairDataset(Dataset):
 
                         if len(parts) < 2:
                             if verbose:
-                                print(f"Warning: Line {line_idx + 1} has less than 2 parts, skipping")
+                                print(
+                                    f"Warning: Line {line_idx + 1} has less than 2 parts, skipping"
+                                )
                             chosen_idx += 1
                             if chosen_idx >= len(chosen_indices):
                                 break
@@ -169,7 +164,9 @@ class SupConPairDataset(Dataset):
 
                         if not left_read or not right_read:
                             if verbose:
-                                print(f"Warning: Line {line_idx + 1} has empty read(s), skipping")
+                                print(
+                                    f"Warning: Line {line_idx + 1} has empty read(s), skipping"
+                                )
                             chosen_idx += 1
                             if chosen_idx >= len(chosen_indices):
                                 break
@@ -195,12 +192,16 @@ class SupConPairDataset(Dataset):
                         parts = stripped_line.split("\t")
                     else:
                         if verbose:
-                            print(f"Warning: Line {line_idx + 1} has no separator, skipping")
+                            print(
+                                f"Warning: Line {line_idx + 1} has no separator, skipping"
+                            )
                         continue
 
                     if len(parts) < 2:
                         if verbose:
-                            print(f"Warning: Line {line_idx + 1} has less than 2 parts, skipping")
+                            print(
+                                f"Warning: Line {line_idx + 1} has less than 2 parts, skipping"
+                            )
                         continue
 
                     left_read = parts[0].strip()
@@ -208,7 +209,9 @@ class SupConPairDataset(Dataset):
 
                     if not left_read or not right_read:
                         if verbose:
-                            print(f"Warning: Line {line_idx + 1} has empty read(s), skipping")
+                            print(
+                                f"Warning: Line {line_idx + 1} has empty read(s), skipping"
+                            )
                         continue
 
                     self.left_reads.append(left_read)
