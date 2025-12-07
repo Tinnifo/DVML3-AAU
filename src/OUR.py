@@ -19,6 +19,7 @@ def reverse_complement(seq: str) -> str:
     return seq.translate(comp_map)[::-1]
 
 
+
 def split_read(seq: str, k: int, L_min_useful: int, W_target: int):
     L = len(seq)
     if L < k:
@@ -107,58 +108,111 @@ class SupConPairDataset(Dataset):
 
         set_seed(seed)
 
-        # Read all lines first
+        # Count total lines first (for reporting)
+        if verbose:
+            print("Counting lines in file...")
         with open(file_path, "r") as f:
-            all_lines = f.readlines()
+            lines_num = sum(1 for _ in f)
 
-        lines_num = len(all_lines)
-
-        # Optional subsampling
-        if max_read_num > 0:
+        # Optimized sampling: only read the lines we need
+        if max_read_num > 0 and max_read_num < lines_num:
+            # Sample line indices without loading entire file
             sample_size = min(max_read_num, lines_num)
-            chosen_indices = set(random.sample(range(lines_num), sample_size))
+            chosen_indices = sorted(random.sample(range(lines_num), sample_size))
+            if verbose:
+                print(f"Sampling {sample_size} lines from {lines_num} total lines...")
         else:
             chosen_indices = None
+            if verbose:
+                print(f"Using all {lines_num} lines from file...")
 
         self.left_reads = []
         self.right_reads = []
 
-        # Parse lines
-        for line_idx, line in enumerate(all_lines):
-            if chosen_indices is not None and line_idx not in chosen_indices:
-                continue
+        # Read only selected lines
+        if chosen_indices is not None:
+            chosen_set = set(chosen_indices)
+            chosen_idx = 0
+            with open(file_path, "r") as f:
+                for line_idx, line in enumerate(f):
+                    if line_idx == chosen_indices[chosen_idx]:
+                        stripped_line = line.strip()
+                        if not stripped_line:
+                            chosen_idx += 1
+                            if chosen_idx >= len(chosen_indices):
+                                break
+                            continue
 
-            stripped_line = line.strip()
-            if not stripped_line:
-                continue
+                        # Handle both comma-separated and tab-separated formats
+                        if "," in stripped_line:
+                            parts = stripped_line.split(",")
+                        elif "\t" in stripped_line:
+                            parts = stripped_line.split("\t")
+                        else:
+                            if verbose:
+                                print(f"Warning: Line {line_idx + 1} has no separator, skipping")
+                            chosen_idx += 1
+                            if chosen_idx >= len(chosen_indices):
+                                break
+                            continue
 
-            # Handle both comma-separated and tab-separated formats
-            if "," in stripped_line:
-                parts = stripped_line.split(",")
-            elif "\t" in stripped_line:
-                parts = stripped_line.split("\t")
-            else:
-                if verbose:
-                    print(f"Warning: Line {line_idx + 1} has no separator, skipping")
-                continue
+                        if len(parts) < 2:
+                            if verbose:
+                                print(f"Warning: Line {line_idx + 1} has less than 2 parts, skipping")
+                            chosen_idx += 1
+                            if chosen_idx >= len(chosen_indices):
+                                break
+                            continue
 
-            if len(parts) < 2:
-                if verbose:
-                    print(
-                        f"Warning: Line {line_idx + 1} has less than 2 parts, skipping"
-                    )
-                continue
+                        left_read = parts[0].strip()
+                        right_read = parts[1].strip()
 
-            left_read = parts[0].strip()
-            right_read = parts[1].strip()
+                        if not left_read or not right_read:
+                            if verbose:
+                                print(f"Warning: Line {line_idx + 1} has empty read(s), skipping")
+                            chosen_idx += 1
+                            if chosen_idx >= len(chosen_indices):
+                                break
+                            continue
 
-            if not left_read or not right_read:
-                if verbose:
-                    print(f"Warning: Line {line_idx + 1} has empty read(s), skipping")
-                continue
+                        self.left_reads.append(left_read)
+                        self.right_reads.append(right_read)
+                        chosen_idx += 1
+                        if chosen_idx >= len(chosen_indices):
+                            break
+        else:
+            # Read all lines (original behavior for small files)
+            with open(file_path, "r") as f:
+                for line_idx, line in enumerate(f):
+                    stripped_line = line.strip()
+                    if not stripped_line:
+                        continue
 
-            self.left_reads.append(left_read)
-            self.right_reads.append(right_read)
+                    # Handle both comma-separated and tab-separated formats
+                    if "," in stripped_line:
+                        parts = stripped_line.split(",")
+                    elif "\t" in stripped_line:
+                        parts = stripped_line.split("\t")
+                    else:
+                        if verbose:
+                            print(f"Warning: Line {line_idx + 1} has no separator, skipping")
+                        continue
+
+                    if len(parts) < 2:
+                        if verbose:
+                            print(f"Warning: Line {line_idx + 1} has less than 2 parts, skipping")
+                        continue
+
+                    left_read = parts[0].strip()
+                    right_read = parts[1].strip()
+
+                    if not left_read or not right_read:
+                        if verbose:
+                            print(f"Warning: Line {line_idx + 1} has empty read(s), skipping")
+                        continue
+
+                    self.left_reads.append(left_read)
+                    self.right_reads.append(right_read)
 
         if verbose:
             print("The data file was read successfully!")

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Script to train the OUR (SupCon) model
 
@@ -7,14 +7,14 @@ BASEFOLDER=$(pwd)
 PYTHON="python"
 SCRIPT_PATH=${BASEFOLDER}/src/OUR.py
 
-# Model Parameters
+# Model Parameters (optimized for MacBook testing)
 INPUT_PATH=${BASEFOLDER}/train_2m.csv
-K=4
-DIM=256
-EPOCHNUM=2
+K=2
+DIM=123
+EPOCHNUM=1
 LR=0.001
-BATCH_SIZE=32
-MAXREADNUM=100
+BATCH_SIZE=8
+MAXREADNUM=20
 MAX_VIEWS_PER_READ=4
 TEMPERATURE=0.1
 SEED=26042024

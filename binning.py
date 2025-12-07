@@ -48,7 +48,8 @@ def main(args):
                 )
                 with open(clustering_data_file_path, "r") as f:
                     reader = csv.reader(f, delimiter="\t")
-                    data = list(reader)[1:]
+                    next(reader)  # Skip header
+                    data = list(reader)  # Read remaining lines
 
                 # Shorten the sequences if they are longer than the
                 dna_sequences = [d[0][:MAX_SEQ_LEN] for d in data]
@@ -87,7 +88,8 @@ def main(args):
 
                 with open(data_file, "r") as f:
                     reader = csv.reader(f, delimiter="\t")
-                    data = list(reader)[1:]
+                    next(reader)  # Skip header
+                    data = list(reader)  # Read remaining lines
 
                 dna_sequences = [d[0][:MAX_SEQ_LEN] for d in data]
                 labels_bin = [d[1] for d in data]
