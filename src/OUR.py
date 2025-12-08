@@ -19,6 +19,7 @@ def reverse_complement(seq: str) -> str:
     return seq.translate(comp_map)[::-1]
 
 
+
 def split_read(seq: str, k: int, L_min_useful: int, W_target: int):
     L = len(seq)
     if L < k:
@@ -37,7 +38,7 @@ def split_read(seq: str, k: int, L_min_useful: int, W_target: int):
         if v2 != v1:
             views.append(v2)
         return views
-
+    
     window_size = W_target
     stride = window_size // 2
     views = []
@@ -53,6 +54,7 @@ def split_read(seq: str, k: int, L_min_useful: int, W_target: int):
             views.append(last)
 
     return views
+
 
 
 def make_views_for_read(
@@ -74,6 +76,7 @@ def make_views_for_read(
             break
 
     return views
+
 
 
 class SupConPairDataset(Dataset):
@@ -224,6 +227,8 @@ class SupConPairDataset(Dataset):
 
     def __len__(self):
         return len(self.left_reads)
+    
+    
 
     def __getitem__(self, idx):
         def _generate_views(seq):
@@ -249,6 +254,7 @@ class SupConPairDataset(Dataset):
         frag_ids = torch.full((len(all_seqs),), idx, dtype=torch.long)
 
         return kmer_profiles, frag_ids
+
 
 
 def supcon_collate_fn(batch):

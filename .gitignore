@@ -14,9 +14,6 @@ venv/
 ENV/
 env/
 
-# IDE
-.idea/
-
 # OS
 .DS_Store
 
@@ -28,4 +25,3 @@ train_2m.csv
 val_48k.csv
 
 sh/
-
