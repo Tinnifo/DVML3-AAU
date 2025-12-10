@@ -7,6 +7,9 @@ import pickle as pkl
 import itertools
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score
+# Set matplotlib backend before importing pyplot (required for headless environments)
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend suitable for servers/headless environments
 import matplotlib.pyplot as plt
 from functools import partial
 import argparse

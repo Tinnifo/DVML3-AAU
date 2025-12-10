@@ -144,13 +144,17 @@ def KMedoid(
             current_medoid = np.mean(features[selected_idx], axis=0)
 
         # Assign the cluster labels and update the row sums (Lines 9-10)
-        if selected_idx is not None:
+        if selected_idx is not None and len(selected_idx) > 0:
             p[selected_idx] = iter_count
             row_sum -= np.sum(similarities[:, selected_idx], axis=1)
             row_sum[selected_idx] = 0
             print(
                 f"Current label: {iter_count}, Number of assigned elements: {len(selected_idx)}"
             )
+        elif selected_idx is not None and len(selected_idx) == 0:
+            # No elements found for this iteration - all remaining points are below similarity threshold
+            # Break the loop as we can't form more clusters
+            break
         else:
             raise ValueError("No selected index")
 
@@ -207,6 +211,10 @@ def compute_class_center_medium_similarity(embeddings, labels, metric="dot"):
     for i in range(len(n_sample_per_class)):
         start = count
         end = count + n_sample_per_class[i]
+        # Skip empty classes to avoid numpy warnings
+        if n_sample_per_class[i] == 0:
+            count += n_sample_per_class[i]
+            continue
         mean = np.mean(embeddings[start:end], axis=0)
         if metric == "dot":
             similarities = np.dot(mean, embeddings[start:end].T).reshape(-1)
